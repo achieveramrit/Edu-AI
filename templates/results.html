@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grading Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .feedback-card {
+            margin-bottom: 20px;
+            border-left: 5px solid #4e73df;
+            padding: 15px;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .high-score { border-left-color: #1cc88a; }
+        .medium-score { border-left-color: #f6c23e; }
+        .low-score { border-left-color: #e74a3b; }
+    </style>
+</head>
+<body>
+    <!-- Spinner for loading -->
+    <div id="loading-spinner" class="text-center" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading results, please wait...</p>
+    </div>
+
+    <div class="container py-5">
+        <h1 class="text-center mb-4">Grading Results</h1>
+
+        <!-- Class Statistics -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">Class Statistics</div>
+                    <div class="card-body">
+                        <p><strong>Average Score:</strong> {{ average_score }}</p>
+                        <p><strong>Highest Score:</strong> {{ highest_score }}</p>
+                        <p><strong>Lowest Score:</strong> {{ lowest_score }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Feedback -->
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                {% if students %}
+                    {% for student in students %}
+                    <div class="feedback-card {% if student.score >= 80 %}high-score{% elif student.score >= 50 %}medium-score{% else %}low-score{% endif %}">
+                        <h5>{{ student.name }} - Score: {{ student.score }}</h5>
+                        <p>{{ student.feedback }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-muted">No students graded yet. Please upload assignments and try again.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-4">
+            <a href="/" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Go back to upload page">Grade Another File</a>
+            <a href="/download-report" class="btn btn-success" data-bs-toggle="tooltip" data-bs-placement="top" title="Download the detailed grading report in CSV format">Download Grading Report</a>
+        </div>
+
+        <!-- Dark Mode Toggle -->
+        <div class="text-end mt-4">
+            <button id="darkModeToggle" class="btn btn-outline-secondary">Toggle Dark Mode</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize Bootstrap tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+        // Dark Mode Toggle
+        const toggleButton = document.getElementById('darkModeToggle');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('bg-dark');
+            document.body.classList.toggle('text-white');
+        });
+
+        // Simulate showing the spinner while loading
+        window.addEventListener('load', () => {
+            document.getElementById('loading-spinner').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

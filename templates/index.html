@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Teacher Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .upload-box {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header {
+            background-color: #4e73df;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header text-center">
+        <h1>AI-Powered Teacher Assistant</h1>
+        <p class="lead">Automated Grading and Personalized Feedback System</p>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Upload Assignment and Rubric</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="/grade" method="POST" enctype="multipart/form-data">
+                            <div class="mb-3 upload-box">
+                                <label for="assignment" class="form-label">Student Assignments (PDF or DOCX)</label>
+                                <input class="form-control" type="file" id="assignment" name="assignment" accept=".pdf,.docx" required>
+                                <small class="text-muted">Upload files in PDF or DOCX format.</small>
+                            </div>
+                            
+                            <div class="mb-3 upload-box">
+                                <label for="rubric" class="form-label">Grading Rubric (PDF or DOCX)</label>
+                                <input class="form-control" type="file" id="rubric" name="rubric" accept=".pdf,.docx" required>
+                                <small class="text-muted">Upload files in PDF or DOCX format.</small>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-robot"></i> Grade Assignments
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <p>This system helps teachers by:</p>
+                    <ul class="list-group">
+                        <li class="list-group-item">Automating grading of assignments</li>
+                        <li class="list-group-item">Providing personalized student feedback</li>
+                        <li class="list-group-item">Identifying class-wide knowledge gaps</li>
+                    </ul>
+                </div>
+
+                <!-- New Section for Downloading Report -->
+                <div class="mt-4 text-center">
+                    <form action="/download-report" method="GET">
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-download"></i> Download Grading Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body><!-- Add a spinner for progress indication -->
+<div id="loading-spinner" class="text-center" style="display: none;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Grading in progress, please wait...</p>
+</div>
+
+<script>
+    // Show the spinner when the form is submitted
+    const form = document.querySelector('form[action="/grade"]');
+    form.addEventListener('submit', () => {
+        document.getElementById('loading-spinner').style.display = 'block';
+    });
+</script>
+</html>
+<script>
+    const assignmentInput = document.getElementById('assignment');
+    const rubricInput = document.getElementById('rubric');
+
+    function validateFile(input) {
+        const allowedExtensions = ['pdf', 'docx'];
+        const fileExtension = input.value.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension)) {
+            alert('Only PDF and DOCX files are allowed.');
+            input.value = ''; // Clear the invalid file
+        }
+    }
+
+    assignmentInput.addEventListener('change', () => validateFile(assignmentInput));
+    rubricInput.addEventListener('change', () => validateFile(rubricInput));
+</script>
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirm Grading</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to start grading the uploaded files?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Yes, Grade</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update the form to trigger the modal -->
+<form action="/grade" method="POST" enctype="multipart/form-data" onsubmit="event.preventDefault(); $('#confirmModal').modal('show');">
+    <!-- Existing form fields -->
+</form>
+<label for="assignment" class="form-label">Student Assignments (PDF or DOCX)</label>
+<input class="form-control" type="file" id="assignment" name="assignment" accept=".pdf,.docx" required aria-describedby="assignmentHelp">
+<small id="assignmentHelp" class="text-muted">Upload files in PDF or DOCX format.</small>
+<!-- Success Alert -->
+<div id="success-alert" class="alert alert-success text-center" style="display: none;" role="alert">
+    Grading completed successfully! You can now download the report.
+</div>
+
+<script>
+    // Simulate showing the success alert after grading
+    // Replace this with actual logic based on server response
+    setTimeout(() => {
+        document.getElementById('success-alert').style.display = 'block';
+    }, 5000); // Simulate a delay
+</script>
+<div class="mt-4 text-center">
+    <form action="/download-report" method="GET">
+        <button type="submit" class="btn btn-success btn-lg w-100" data-bs-toggle="tooltip" data-bs-placement="top" title="Download the detailed grading report in CSV format.">
+            <i class="bi bi-download"></i> Download Grading Report
+        </button>
+    </form>
+</div>
+
+<script>
+    // Initialize Bootstrap tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
+<!-- Dark Mode Toggle -->
+<div class="text-end">
+    <button id="darkModeToggle" class="btn btn-outline-secondary">Toggle Dark Mode</button>
+</div>
+
+<script>
+    const toggleButton = document.getElementById('darkModeToggle');
+    toggleButton.addEventListener('click', () => {
+        document.body.classList.toggle('bg-dark');
+        document.body.classList.toggle('text-white');
+    });
+</script>
